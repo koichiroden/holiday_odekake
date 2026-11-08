@@ -79,15 +79,19 @@
     <section class="panel">
       <h2><span class="step">1</span>出発とおでかけ先</h2>
       <div class="dest-btns" id="dest-btns" role="group" aria-label="おでかけ先のプリセット"></div>
-      <p class="hint">プリセットを押すと、到着駅・表紙のイラスト・置き換えアイテム(お金・時間)が切り替わります。表紙のイラスト: 舞浜=城と花火、横浜=観覧車と超高層ビル、川越=蔵の町並みと鐘つき櫓、新宿=高層ビル群、渋谷=交差点とビル。</p>
+      <p class="hint">場所のプリセットを押すと、到着駅・表紙のイラスト・置き換えアイテム(お金・時間)が切り替わります。行楽地のタイプ(海・山・モール・温泉街・神社・お寺)は、好きな到着駅のままイラストと置き換えアイテムだけを切り替えます。表紙のイラスト: 舞浜=城と花火、横浜=観覧車と超高層ビル、川越=蔵の町並みと鐘つき櫓、新宿=高層ビル群、渋谷=交差点とビル、羽田空港=飛行機と管制塔、成田空港=飛行機と滑走路、スカイツリー=電波塔。</p>
       <div class="field-grid">
-        <div class="field"><label for="f-oname">出発地の表示名(空欄=1本目の出発駅)</label><input type="text" id="f-oname"></div>
-        <div class="field"><label for="f-dname">おでかけ先の表示名(空欄=1本目の到着駅)</label><input type="text" id="f-dname"></div>
+        <div class="field"><label for="f-oname">出発地の名前(空欄=1本目の出発駅)</label><input type="text" id="f-oname" list="place-names"></div>
+        <div class="field"><label for="f-oll">出発地の緯度,経度(任意)</label><input type="text" id="f-oll" class="mono" placeholder="35.7990, 139.4688"></div>
+        <div class="field"><label for="f-dname">おでかけ先の名前(空欄=1本目の到着駅)</label><input type="text" id="f-dname" list="place-names"></div>
+        <div class="field"><label for="f-dll">おでかけ先の緯度,経度(任意)</label><input type="text" id="f-dll" class="mono" placeholder="35.6329, 139.8804"></div>
         <div class="field"><label for="f-theme">表紙のイラスト</label><select id="f-theme">
           <option value="maihama">舞浜(城と花火)</option><option value="yokohama">横浜(観覧車・ビル)</option><option value="kawagoe">川越(古い町並み)</option>
-          <option value="shinjuku">新宿(高層ビル群)</option><option value="shibuya">渋谷(交差点)</option><option value="none">なし</option></select></div>
+          <option value="shinjuku">新宿(高層ビル群)</option><option value="shibuya">渋谷(交差点)</option><option value="haneda">羽田空港(飛行機と管制塔)</option><option value="narita">成田空港(飛行機と滑走路)</option><option value="skytree">スカイツリー(電波塔)</option>
+          <option value="sea">海の行楽地(海・夕日・パラソル)</option><option value="mountain">山の行楽地(山・ロープウェイ)</option><option value="mall">ショッピングモール(建物・紙袋)</option>
+          <option value="onsen">温泉街(湯けむり・旅館)</option><option value="shrine">神社(鳥居・社殿)</option><option value="temple">お寺(本堂・五重塔)</option><option value="none">なし</option></select></div>
       </div>
-      <p class="hint">表紙の地図には路線図は載せず、発着の2点だけを置きます(1本目のルートの最初と最後の駅の位置)。</p>
+      <p class="hint">表紙の地図には発着の2点だけを置きます。名前は「自宅」「〇〇キャンプ場」など自由に書けます。位置は 緯度経度 → 名前が駅・空港などなら その位置 → 1本目のルートの最初と最後の駅 の順で決めます。緯度経度は Googleマップで場所を右クリックしたときに出る「35.xxx, 139.xxx」をそのまま貼れます。</p>
     </section>
 
     <section class="panel">
@@ -162,7 +166,8 @@ const ROMAJI = { "所沢": "tokorozawa", "舞浜": "maihama", "仙台": "sendai"
   "鎌倉": "kamakura", "江ノ島": "enoshima", "片瀬江ノ島": "katasenoshima", "箱根湯本": "hakoneyumoto", "小田原": "odawara", "成田空港": "narita", "羽田空港": "haneda",
   "東京ディズニーランド": "tdl", "東京ディズニーシー": "tds", "東京ディズニーリゾート": "tdr", "盛岡": "morioka", "福島": "fukushima", "郡山": "koriyama", "宇都宮": "utsunomiya",
   "高崎": "takasaki", "長野": "nagano", "新潟": "niigata", "金沢": "kanazawa", "静岡": "shizuoka", "浜松": "hamamatsu", "名古屋": "nagoya", "京都": "kyoto", "新大阪": "shinosaka",
-  "大阪": "osaka", "岡山": "okayama", "広島": "hiroshima", "博多": "hakata", "高尾山口": "takaosanguchi", "河口湖": "kawaguchiko", "日光": "nikko", "鬼怒川温泉": "kinugawaonsen", "熱海": "atami" };
+  "大阪": "osaka", "岡山": "okayama", "広島": "hiroshima", "博多": "hakata", "高尾山口": "takaosanguchi", "河口湖": "kawaguchiko", "日光": "nikko", "鬼怒川温泉": "kinugawaonsen", "熱海": "atami", "羽田空港第1・第2ターミナル": "haneda", "羽田空港第3ターミナル": "haneda_t3", "羽田空港第1ターミナル": "haneda_t1",
+  "羽田空港第2ターミナル": "haneda_t2", "とうきょうスカイツリー": "skytree", "スカイツリー": "skytree", "押上": "oshiage", "成田": "narita_city", "京成成田": "keiseinarita" };
 function autoValues(st) {
   const r0 = st.routes[0];
   let o = st.origin_name || r0?.legs[0]?.from || "", d = st.dest_name || r0?.legs.at(-1)?.to || "";
@@ -180,6 +185,25 @@ function autoValues(st) {
     kicker: `${o}→${d} 節約くらべ`, slug, as_of: `${ym}・大人片道の一例` };
 }
 const val = k => (String(state[k] ?? "").trim() || autoValues(state)[k]);
+// 発着の位置: 緯度経度の入力 → 名前(駅・空港などの既知の場所)→ 1本目のルートの端の駅
+function endpointCoord(which) {
+  const ll = parseLL(which === "origin" ? state.origin_ll : state.dest_ll);
+  if (ll) return ll;
+  const r0 = state.routes[0]; if (!r0) return null;
+  const typed = String(state[which === "origin" ? "origin_name" : "dest_name"] || "").trim();
+  const leg = which === "origin" ? r0.legs[0] : r0.legs.at(-1);
+  const stName = which === "origin" ? leg.from : leg.to;
+  const legLL = which === "origin" ? leg.from_ll : leg.to_ll;
+  if (typed && typed !== stName) { const c = placeCoord(typed, "", null); if (c) return c; }
+  return placeCoord(stName, leg.line, legLL);
+}
+function endpointSpec(which) {
+  const name = val(which === "origin" ? "origin_name" : "dest_name");
+  const ll = parseLL(which === "origin" ? state.origin_ll : state.dest_ll);
+  const c = ll || endpointCoord(which);
+  // 位置は config に書き出す(Python 側はこれをそのまま使う)
+  return c ? { name, lat: +c[1].toFixed(5), lon: +c[0].toFixed(5), ...(ll ? { ll_typed: true } : {}) } : { name };
+}
 function refreshAutoPlaceholders() {
   const a = autoValues(state);
   [["f-oname", "origin_name"], ["f-dname", "dest_name"], ["f-title1", "title_line1"], ["f-title2", "title_line2"], ["f-kicker", "kicker"], ["f-slug", "slug"], ["f-asof", "as_of"]]
@@ -216,6 +240,34 @@ const DESTS = {
   shibuya: { label: "渋谷", line: "山手線", station: "渋谷",
     money: [BOTTLE, { label: "カフェのドリンク", price: 500, unit: "杯", icon: "cafe", price_note: "目安" }, { label: "映画のチケット", price: 2000, unit: "枚", icon: "ticket", price_note: "目安" }],
     time: [TOILET, { label: "スクランブル交差点を渡る", min: 1, unit: "回", icon: "walk", min_note: "信号1回ぶん" }, CAFE], tags: ["#渋谷"] },
+  haneda: { label: "羽田空港", line: "京急空港線", station: "羽田空港第1・第2ターミナル",
+    money: [BOTTLE, { label: "空港での軽食", price: 800, unit: "回", icon: "snack", price_note: "目安" }, { label: "空港のおみやげ", price: 1500, unit: "個", icon: "yen", price_note: "目安" }],
+    time: [TOILET, { label: "保安検査の締切", min: 20, unit: "回", icon: "clock", min_note: "国内線は出発20分前(ANA)" }, CAFE], tags: ["#羽田空港"] },
+  narita: { label: "成田空港", line: "京成本線", station: "成田空港",
+    money: [BOTTLE, { label: "空港での軽食", price: 800, unit: "回", icon: "snack", price_note: "目安" }, { label: "空港のおみやげ", price: 1500, unit: "個", icon: "yen", price_note: "目安" }],
+    time: [TOILET, { label: "保安検査の締切", min: 20, unit: "回", icon: "clock", min_note: "国内線は出発20分前(ANA)" }, CAFE], tags: ["#成田空港"] },
+  skytree: { label: "スカイツリー", line: "東武伊勢崎線", station: "とうきょうスカイツリー",
+    money: [BOTTLE, { label: "ソラマチの軽食", price: 800, unit: "回", icon: "snack", price_note: "目安" }, { label: "天望デッキ", price: 2400, unit: "回", icon: "ticket", price_note: "大人・平日当日券。要確認" }],
+    time: [TOILET, { label: "ソラマチをぶらり", min: 30, unit: "回", icon: "walk", min_note: "目安" }, CAFE], tags: ["#スカイツリー", "#押上"] },
+  // 汎用(到着駅はそのまま。イラストと置き換えアイテムだけ切り替える)
+  sea: { label: "海の行楽地", generic: true,
+    money: [BOTTLE, { label: "かき氷", price: 600, unit: "杯", icon: "snack", price_note: "目安" }, { label: "海の家のランチ", price: 1500, unit: "回", icon: "yen", price_note: "目安" }],
+    time: [TOILET, { label: "浜辺でひと泳ぎ", min: 30, unit: "回", icon: "walk", min_note: "目安" }, CAFE], tags: ["#海", "#海水浴"] },
+  mountain: { label: "山の行楽地", generic: true,
+    money: [BOTTLE, { label: "おにぎり", price: 200, unit: "個", icon: "snack", price_note: "目安" }, { label: "ロープウェイ", price: 1000, unit: "回", icon: "ticket", price_note: "目安・山により違う" }],
+    time: [TOILET, { label: "山頂で景色をながめる", min: 15, unit: "回", icon: "walk", min_note: "目安" }, { label: "山小屋でひと休み", min: 30, unit: "回", icon: "cafe", min_note: "目安" }], tags: ["#山", "#ハイキング"] },
+  mall: { label: "ショッピングモール", generic: true,
+    money: [BOTTLE, { label: "フードコートのランチ", price: 1000, unit: "回", icon: "snack", price_note: "目安" }, { label: "映画のチケット", price: 2000, unit: "枚", icon: "ticket", price_note: "目安" }],
+    time: [TOILET, { label: "試着", min: 10, unit: "回", icon: "clock", min_note: "目安" }, CAFE], tags: ["#ショッピングモール", "#お買い物"] },
+  onsen: { label: "温泉街", generic: true,
+    money: [BOTTLE, { label: "温泉まんじゅう", price: 150, unit: "個", icon: "snack", price_note: "目安" }, { label: "日帰り入浴", price: 1000, unit: "回", icon: "ticket", price_note: "目安" }],
+    time: [TOILET, { label: "足湯でひと休み", min: 15, unit: "回", icon: "clock", min_note: "目安" }, { label: "温泉につかる", min: 20, unit: "回", icon: "clock", min_note: "目安" }], tags: ["#温泉", "#温泉街"] },
+  shrine: { label: "神社", generic: true,
+    money: [BOTTLE, { label: "おみくじ", price: 200, unit: "回", icon: "ticket", price_note: "目安" }, { label: "お守り", price: 1000, unit: "個", icon: "yen", price_note: "目安" }],
+    time: [TOILET, { label: "参拝の列", min: 10, unit: "回", icon: "walk", min_note: "目安" }, CAFE], tags: ["#神社", "#神社巡り"] },
+  temple: { label: "お寺", generic: true,
+    money: [BOTTLE, { label: "御朱印", price: 500, unit: "回", icon: "ticket", price_note: "目安" }, { label: "拝観料", price: 500, unit: "回", icon: "yen", price_note: "目安" }],
+    time: [TOILET, { label: "境内をひとめぐり", min: 20, unit: "回", icon: "walk", min_note: "目安" }, CAFE], tags: ["#お寺", "#寺社巡り"] }
 };
 const SAMPLE = {
   slug: "", theme: "maihama", origin_name: "", dest_name: "",
@@ -369,8 +421,10 @@ function buildConfig() {
       if (rz?.to !== d && !near(placeCoord(rz?.to, rz?.line, rz?.to_lonlat && `${rz.to_lonlat[1]},${rz.to_lonlat[0]}`), placeCoord(d, lz?.line))) problems.push(`${r.name}: 到着地が1本目(${d})と違います(3km以上離れている、または位置が不明)`);
     });
     const r0 = state.routes[0];
-    if (r0 && !placeCoord(r0.legs[0].from, r0.legs[0].line, r0.legs[0].from_ll)) problems.push(`表紙の地図: 出発地「${r0.legs[0].from}」の位置がわかりません。1本目の最初の区間に緯度経度を入れてください`);
-    if (r0 && !placeCoord(r0.legs.at(-1).to, r0.legs.at(-1).line, r0.legs.at(-1).to_ll)) problems.push(`表紙の地図: 到着地「${r0.legs.at(-1).to}」の位置がわかりません。1本目の最後の区間に緯度経度を入れてください`);
+    if (r0 && !endpointCoord("origin")) problems.push(`表紙の地図: 出発地「${val("origin_name")}」の位置がわかりません。「出発地の緯度,経度」を入れてください`);
+    if (r0 && !endpointCoord("destination")) problems.push(`表紙の地図: おでかけ先「${val("dest_name")}」の位置がわかりません。「おでかけ先の緯度,経度」を入れてください`);
+    if (String(state.origin_ll || "").trim() && !parseLL(state.origin_ll)) problems.push("出発地の緯度,経度は「35.7990, 139.4688」の形で入れてください");
+    if (String(state.dest_ll || "").trim() && !parseLL(state.dest_ll)) problems.push("おでかけ先の緯度,経度は「35.6329, 139.8804」の形で入れてください");
   }
   if (state.stale) problems.push("おでかけ先を変えました。各ルートの区間・運賃・所要時間・ファイル名を見直してください(運賃か所要時間を入れ直すとこの注意は消えます)");
   if (!slugOk(val("slug"))) problems.push("ファイル名(slug)は英数字・_・- で入れてください");
@@ -385,7 +439,7 @@ function buildConfig() {
   const cfg = {
     video_type: "savings", slug: val("slug"), title_line1: val("title_line1"), title_line2: val("title_line2"), kicker: val("kicker"),
     cover_kicker: "おでかけ節約くらべ", destination_theme: state.theme,
-    origin: { name: val("origin_name") }, destination: { name: val("dest_name") },
+    origin: endpointSpec("origin"), destination: endpointSpec("destination"),
     as_of: val("as_of"), handle: state.handle || "@geogram_jp", fare_label: state.fare_label || "IC運賃(大人・片道)", time_label: state.time_label || "所要時間(乗換・徒歩こみ)",
     basis: state.basis, trips_per_year: num(state.trips_per_year) || 0,
     ...(String(state.arrive_by || "").trim() ? { arrive_by: String(state.arrive_by).trim().replace("：", ":") } : {}),
@@ -403,13 +457,27 @@ function dist(a, b) { const R = 6371, p = Math.PI / 180; const dl = (b[1] - a[1]
 function bind(id, key) { const e = document.getElementById(id); e.value = state[key] ?? ""; e.oninput = () => { state[key] = e.value; update(); }; e.onchange = e.oninput; }
 function renderDestBtns() {
   const box = document.getElementById("dest-btns"); box.innerHTML = "";
-  Object.entries(DESTS).forEach(([k, d]) => box.appendChild(el("button", { type: "button", "aria-pressed": String(state.theme === k), onclick: () => applyDest(k) }, [d.label])));
+  const btn = ([k, d]) => el("button", { type: "button", "aria-pressed": String(state.theme === k), onclick: () => applyDest(k) }, [d.label]);
+  const ent = Object.entries(DESTS);
+  box.appendChild(el("span", { class: "hint", style: "width:100%;margin:0" }, ["場所(到着駅も切り替わる)"]));
+  ent.filter(([, d]) => !d.generic).forEach(e => box.appendChild(btn(e)));
+  box.appendChild(el("span", { class: "hint", style: "width:100%;margin:6px 0 0" }, ["行楽地のタイプ(到着駅はそのまま。イラストと置き換えアイテムだけ切り替わる)"]));
+  ent.filter(([, d]) => d.generic).forEach(e => box.appendChild(btn(e)));
 }
 function applyDest(k) {
   const d = DESTS[k];
   const prev = state.dest_name;
-  state.theme = k; state.dest_name = "";
+  state.theme = k;
   state.money_items = structuredClone(d.money); state.time_items = structuredClone(d.time);
+  const presetTags = new Set(Object.values(DESTS).flatMap(x => x.tags).concat(prev ? [`#${prev}`] : []));
+  if (d.generic) {
+    // 到着駅・タイトルはそのまま。イラストと置き換えアイテム・ハッシュタグだけ替える
+    const genericTags = new Set(Object.values(DESTS).filter(x => x.generic).flatMap(x => x.tags));
+    state.hashtags = state.hashtags.split(/\s+/).filter(t => t && !genericTags.has(t)).concat(d.tags).join(" ");
+    renderAll();
+    return;
+  }
+  state.dest_name = d.label !== d.station ? d.label : "";   // 駅名が長いときは短い表示名(羽田空港・スカイツリー)
   // 各ルートの最後の区間の到着駅を差し替え(その路線に駅がなければ到着駅の路線ごと替える)
   state.routes.forEach(r => {
     const last = r.legs.at(-1);
@@ -418,7 +486,7 @@ function applyDest(k) {
   });
   const o = state.origin_name || "";
   state.title_line1 = ""; state.kicker = ""; state.slug = ""; state.title_line2 = "";   // 自動に戻す
-  state.hashtags = state.hashtags.split(/\s+/).filter(t => t && t !== `#${prev}`).concat(d.tags.filter(t => !state.hashtags.includes(t))).join(" ");
+  state.hashtags = state.hashtags.split(/\s+/).filter(t => t && !presetTags.has(t)).concat(d.tags).join(" ");
   state.money_tips = ""; state.time_tips = ""; state.verdict1 = ""; state.verdict2 = "";
   state.stale = true;
   renderAll();
@@ -537,7 +605,9 @@ function renderPreview(cfg) {
   // 1. 表紙
   const o0 = rs[0].legs[0], d0 = rs[0].legs.at(-1);
   const ll2 = x => x ? `${x[1]},${x[0]}` : null;
-  const pts = [placeCoord(o0.from, o0.line, ll2(o0.from_lonlat)), placeCoord(d0.to, d0.line, ll2(d0.to_lonlat))].filter(Boolean);
+  const cO = cfg.origin.lat != null ? [cfg.origin.lon, cfg.origin.lat] : placeCoord(o0.from, o0.line, ll2(o0.from_lonlat));
+  const cD = cfg.destination.lat != null ? [cfg.destination.lon, cfg.destination.lat] : placeCoord(d0.to, d0.line, ll2(d0.to_lonlat));
+  const pts = [cO, cD].filter(Boolean);
   const svg = svgEl("svg", { class: "map", viewBox: "0 0 100 70", preserveAspectRatio: "xMidYMid meet" });
   if (pts.length) {
     const lat0 = pts.reduce((a, p) => a + p[1], 0) / pts.length, cs = Math.cos(lat0 * Math.PI / 180);
@@ -546,14 +616,16 @@ function renderPreview(cfg) {
     const sc = Math.min(60 / Math.max(x1 - x0, 1e-4), 36 / Math.max(y1 - y0, 1e-4));
     const P = c => [20 + (c[0] * cs - x0) * sc + (60 - (x1 - x0) * sc) / 2, 20 + (-c[1] - y0) * sc + (36 - (y1 - y0) * sc) / 2];
     const o = rs[0].legs[0], d = rs[0].legs.at(-1);
-    [[placeCoord(o.from, o.line, ll2(o.from_lonlat)), "発 " + (cfg.origin.name || o.from)], [placeCoord(d.to, d.line, ll2(d.to_lonlat)), "着 " + (cfg.destination.name || d.to)]].forEach(([c, t]) => {
+    [[cO, "発 " + (cfg.origin.name || o.from)], [cD, "着 " + (cfg.destination.name || d.to)]].forEach(([c, t]) => {
       if (!c) return; const [x, y] = P(c);
       svg.appendChild(svgEl("circle", { cx: x, cy: y, r: 1.8, fill: "#fff", stroke: "#ffd228", "stroke-width": 0.8 }));
       svg.appendChild(svgEl("text", { x, y: y - 3.4, "text-anchor": "middle", "font-size": 3.6, "font-weight": 900, fill: "#fff" }, t));
     });
   }
-  const themeLab = { maihama: "城と花火", yokohama: "観覧車・超高層ビル", kawagoe: "蔵の町並み・鐘つき櫓", shinjuku: "高層ビル群", shibuya: "交差点とビル" }[cfg.destination_theme];
-  const accHex = { maihama: "#ff8cc8", yokohama: "#5ac8ff", kawagoe: "#ffaa50", shinjuku: "#96aaff", shibuya: "#78e6c8" }[cfg.destination_theme] || "#ffd228";
+  const themeLab = { maihama: "城と花火", yokohama: "観覧車・超高層ビル", kawagoe: "蔵の町並み・鐘つき櫓", shinjuku: "高層ビル群", shibuya: "交差点とビル", haneda: "飛行機と管制塔", narita: "飛行機と滑走路", skytree: "電波塔とビル",
+    sea: "海・夕日・パラソル", mountain: "山・ロープウェイ", mall: "モールの建物・紙袋", onsen: "湯けむり・旅館", shrine: "鳥居・社殿", temple: "本堂・五重塔" }[cfg.destination_theme];
+  const accHex = { maihama: "#ff8cc8", yokohama: "#5ac8ff", kawagoe: "#ffaa50", shinjuku: "#96aaff", shibuya: "#78e6c8", haneda: "#6ec8ff", narita: "#ffb96e", skytree: "#af96ff",
+    sea: "#50d2eb", mountain: "#78dc82", mall: "#ffc85a", onsen: "#ff9673", shrine: "#ff5f55", temple: "#ebc36e" }[cfg.destination_theme] || "#ffd228";
   pv.appendChild(el("div", { class: "slide cover", style: `--acc:${accHex}` }, [
     themeLab ? el("div", { class: "theme" }, [`イラスト: ${themeLab}`]) : null,
     el("div", { class: "sub", style: "color:#ffd228;font-weight:900" }, ["おでかけ節約くらべ"]),
@@ -641,7 +713,7 @@ function update() {
   draftSave(LS_KEY, state);
 }
 function renderAll() {
-  [["f-oname", "origin_name"], ["f-dname", "dest_name"], ["f-theme", "theme"], ["f-title1", "title_line1"], ["f-title2", "title_line2"], ["f-slug", "slug"], ["f-kicker", "kicker"],
+  [["f-oname", "origin_name"], ["f-oll", "origin_ll"], ["f-dname", "dest_name"], ["f-dll", "dest_ll"], ["f-theme", "theme"], ["f-title1", "title_line1"], ["f-title2", "title_line2"], ["f-slug", "slug"], ["f-kicker", "kicker"],
    ["f-asof", "as_of"], ["f-handle", "handle"], ["f-farel", "fare_label"], ["f-timel", "time_label"], ["f-basis", "basis"], ["f-trips", "trips_per_year"], ["f-arrive", "arrive_by"], ["f-wage", "hourly_wage"], ["f-wagel", "wage_label"],
    ["f-mtips", "money_tips"], ["f-ttips", "time_tips"], ["f-v1", "verdict1"], ["f-v2", "verdict2"], ["f-tags", "hashtags"]].forEach(([i, k]) => bind(i, k));
   renderDestBtns(); renderRoutes(); renderItems("money-items", state.money_items, "price"); renderItems("time-items", state.time_items, "min"); update();
@@ -661,6 +733,7 @@ function importConfig(c) {
   if (c.video_type !== "savings") throw new Error("video_type が savings のJSONではありません");
   const s = x => x == null ? "" : String(x), v = [].concat(c.verdict || []);
   state = { slug: c.slug || "", theme: c.destination_theme || "none", origin_name: c.origin?.name || "", dest_name: c.destination?.name || "",
+    origin_ll: c.origin?.lat != null && c.origin?.ll_typed ? `${c.origin.lat}, ${c.origin.lon}` : "", dest_ll: c.destination?.lat != null && c.destination?.ll_typed ? `${c.destination.lat}, ${c.destination.lon}` : "",
     title_line1: c.title_line1 || "", title_line2: c.title_line2 || "", kicker: c.kicker || "", as_of: c.as_of || "", handle: c.handle || "@geogram_jp",
     basis: c.basis || "round_trip", trips_per_year: s(c.trips_per_year), hourly_wage: s(c.hourly_wage), wage_label: c.wage_label || "",
     money_items: (c.money_items || []).map(x => ({ ...x })), time_items: (c.time_items || []).map(x => ({ ...x })),
