@@ -1,0 +1,200 @@
+{
+  "video_type": "savings",
+  "slug": "savings_sendai_maihama",
+  "title_line1": "仙台 → 舞浜",
+  "title_line2": "新幹線・夜行バス・飛行機、どれがおトク?",
+  "kicker": "仙台→舞浜 節約くらべ",
+  "cover_kicker": "おでかけ節約くらべ",
+  "destination_theme": "maihama",
+  "origin": {
+    "name": "仙台"
+  },
+  "destination": {
+    "name": "舞浜"
+  },
+  "as_of": "2026年11月時点・大人片道の一例",
+  "handle": "@geogram_jp",
+  "fare_label": "運賃(大人・片道。新幹線は指定席)",
+  "time_label": "所要時間(乗換・空港での待ちこみ)",
+  "basis": "round_trip",
+  "trips_per_year": 2,
+  "arrive_by": "09:00",
+  "hourly_wage": 1280,
+  "wage_label": "(東京都の最低賃金)",
+  "routes": [
+    {
+      "key": "shinkansen",
+      "name": "新幹線ルート",
+      "short_name": "新幹線",
+      "color": [
+        0,
+        160,
+        110
+      ],
+      "legs": [
+        {
+          "mode": "shinkansen",
+          "line": "東北新幹線",
+          "train": "はやぶさ",
+          "from": "仙台",
+          "to": "東京"
+        },
+        {
+          "mode": "rail",
+          "line": "京葉線",
+          "from": "東京",
+          "to": "舞浜"
+        }
+      ],
+      "fare": {
+        "ic": 11960
+      },
+      "fare_note": "乗車券¥6,600+指定席特急券¥5,360",
+      "time_min": 130
+    },
+    {
+      "key": "bus",
+      "name": "夜行バスルート",
+      "short_name": "夜行バス",
+      "color": [
+        150,
+        120,
+        230
+      ],
+      "legs": [
+        {
+          "mode": "bus",
+          "line": "夜行バス",
+          "from": "仙台",
+          "to": "東京ディズニーランド"
+        }
+      ],
+      "fare": {
+        "ic": 2800,
+        "from": true
+      },
+      "fare_note": "便・日によって変わる",
+      "time_min": 410,
+      "time_note": "24:10発→7:00着の例",
+      "depart_time": "24:10",
+      "arrive_time": "07:00"
+    },
+    {
+      "key": "plane",
+      "name": "飛行機ルート",
+      "short_name": "飛行機",
+      "color": [
+        40,
+        140,
+        230
+      ],
+      "legs": [
+        {
+          "mode": "train",
+          "line": "仙台空港アクセス線",
+          "from": "仙台",
+          "to": "仙台空港"
+        },
+        {
+          "mode": "plane",
+          "line": "ANA",
+          "from": "仙台空港",
+          "to": "成田空港"
+        },
+        {
+          "mode": "bus",
+          "line": "リムジンバス",
+          "from": "成田空港",
+          "to": "東京ディズニーリゾート"
+        }
+      ],
+      "fare": {
+        "ic": 13240,
+        "from": true
+      },
+      "fare_note": "アクセス線¥660+航空券¥9,680〜+リムジンバス¥2,900",
+      "time_min": 240,
+      "time_note": "空港での待ち約70分を含む目安",
+      "schedule_text": "当日は間に合わない(朝の便は8:30発)",
+      "schedule_short": "当日×"
+    }
+  ],
+  "money_items": [
+    {
+      "label": "ペットボトル飲料",
+      "price": 200,
+      "unit": "本",
+      "icon": "bottle",
+      "price_note": "自販機・コンビニ目安"
+    },
+    {
+      "label": "パークの軽食",
+      "price": 500,
+      "unit": "回",
+      "icon": "snack",
+      "price_note": "目安"
+    },
+    {
+      "label": "1デーパスポート",
+      "price": 12400,
+      "unit": "枚",
+      "icon": "ticket",
+      "price_note": "最高額"
+    }
+  ],
+  "time_items": [
+    {
+      "label": "カフェで一息",
+      "min": 30,
+      "unit": "回",
+      "icon": "cafe",
+      "min_note": "目安"
+    },
+    {
+      "label": "映画1本",
+      "min": 120,
+      "unit": "本",
+      "icon": "clock",
+      "min_note": "目安"
+    },
+    {
+      "label": "トイレの行列",
+      "min": 5,
+      "unit": "回",
+      "icon": "toilet",
+      "min_note": "目安"
+    }
+  ],
+  "money_tips": [
+    "航空券は最安クラスの参考運賃。時期や予約のタイミングで大きく変わる"
+  ],
+  "time_tips": [
+    "夜行バスは寝ている間に移動。朝7時に着くので、宿代1泊分もかからない",
+    "飛行機は保安検査の締切(出発20分前)や空港までの移動を足すと新幹線より遅い"
+  ],
+  "verdict": [
+    "安さなら夜行バス、速さなら新幹線",
+    "飛行機は空港までの移動と待ち時間が響いて、高くて遅い"
+  ],
+  "hashtags": [
+    "#おでかけ節約",
+    "#仙台",
+    "#舞浜",
+    "#新幹線",
+    "#夜行バス",
+    "#飛行機",
+    "#地図",
+    "#Geogram_JP"
+  ],
+  "_sources": [
+    "新幹線: 駅探 仙台→舞浜 2026/11/8 14:57発 はやぶさ22号+京葉線 2時間10分 ¥11,960(乗車券6,600+指定席5,360) https://ekitan.com/transit/route/sf-1021/st-3022",
+    "夜行バス: 高速バスドットコム 仙台→TDR 2026/11/9便 ツーリストバスTB102 24:10→7:00 6時間50分 ¥2,800 https://www.kosokubus.com/bus_list/00004/00013-00213/",
+    "仙台空港アクセス線 約25分 ¥660前後: travelist https://travelist.jp/airport_SDJ/guide/posts/p973",
+    "仙台→成田 ANA 約55分 ¥9,680〜(参考): travelist https://travelist.jp/airport_NRT/airport_SDJ/",
+    "成田空港→TDR リムジンバス 大人¥2,900: 東京空港交通 https://www.limousinebus.co.jp/ja/line/detail/Narita-TDR/ / 所要約90分: TDR公式 https://www.tokyodisneyresort.jp/hotel/fsh/access/airport/",
+    "保安検査締切 出発20分前(ANA国内線): 乗りものニュース https://trafficnews.jp/post/88840",
+    "飛行機ルートの所要240分 = 25 + 空港での待ち40 + 飛行55 + 成田で乗り場移動・待ち30 + バス90 (目安)",
+    "東京都最低賃金 ¥1,280: 東京労働局",
+    "仙台→成田 ANA 1日2便 8:30〜14:30発: travelist https://travelist.jp/airline_ANA/airport_NRT/airport_SDJ"
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "video_type": "savings",
+  "slug": "savings_tokorozawa_maihama",
+  "title_line1": "所沢 → 舞浜",
+  "title_line2": "どのルートで行くとおトク?",
+  "kicker": "所沢→舞浜 節約くらべ",
+  "cover_kicker": "おでかけ節約くらべ",
+  "destination_theme": "maihama",
+  "origin": {
+    "name": "所沢"
+  },
+  "destination": {
+    "name": "舞浜"
+  },
+  "as_of": "2026年11月時点・日曜13:30発の検索例",
+  "handle": "@geogram_jp",
+  "fare_label": "IC運賃(大人・片道)",
+  "time_label": "所要時間(乗換・徒歩こみ)",
+  "basis": "round_trip",
+  "trips_per_year": 6,
+  "arrive_by": "09:00",
+  "hourly_wage": 1280,
+  "wage_label": "(東京都の最低賃金)",
+  "routes": [
+    {
+      "key": "shinkiba",
+      "name": "有楽町線・新木場ルート",
+      "short_name": "新木場乗換",
+      "color": [
+        193,
+        164,
+        112
+      ],
+      "legs": [
+        {
+          "line": "西武池袋線",
+          "from": "所沢",
+          "to": "練馬",
+          "train": "Fライナー"
+        },
+        {
+          "line": "西武有楽町線",
+          "from": "練馬",
+          "to": "小竹向原",
+          "through": true
+        },
+        {
+          "line": "有楽町線",
+          "from": "小竹向原",
+          "to": "新木場"
+        },
+        {
+          "line": "京葉線",
+          "from": "新木場",
+          "to": "舞浜"
+        }
+      ],
+      "fare": {
+        "ic": 854,
+        "ticket": 870
+      },
+      "time_min": 76
+    },
+    {
+      "key": "tokyo",
+      "name": "丸ノ内線・東京駅ルート",
+      "short_name": "東京駅乗換",
+      "color": [
+        246,
+        46,
+        54
+      ],
+      "legs": [
+        {
+          "line": "西武池袋線",
+          "from": "所沢",
+          "to": "練馬",
+          "train": "Fライナー"
+        },
+        {
+          "line": "西武有楽町線",
+          "from": "練馬",
+          "to": "小竹向原",
+          "through": true
+        },
+        {
+          "line": "副都心線",
+          "from": "小竹向原",
+          "to": "池袋",
+          "through": true
+        },
+        {
+          "line": "丸ノ内線",
+          "from": "池袋",
+          "to": "東京"
+        },
+        {
+          "line": "京葉線",
+          "from": "東京",
+          "to": "舞浜"
+        }
+      ],
+      "fare": {
+        "ic": 867,
+        "ticket": 890
+      },
+      "time_min": 76
+    },
+    {
+      "key": "musashino",
+      "name": "武蔵野線ルート",
+      "short_name": "武蔵野線",
+      "color": [
+        241,
+        90,
+        34
+      ],
+      "legs": [
+        {
+          "line": "西武池袋線",
+          "from": "所沢",
+          "to": "秋津"
+        },
+        {
+          "line": "武蔵野線",
+          "from": "新秋津",
+          "to": "新浦安"
+        },
+        {
+          "line": "京葉線",
+          "from": "新浦安",
+          "to": "舞浜",
+          "through": true
+        }
+      ],
+      "fare": {
+        "ic": 1203,
+        "ticket": 1210
+      },
+      "time_min": 99,
+      "transfer_walk_min": 9
+    }
+  ],
+  "money_items": [
+    {
+      "label": "ペットボトル飲料",
+      "price": 200,
+      "unit": "本",
+      "icon": "bottle",
+      "price_note": "自販機・コンビニ目安"
+    },
+    {
+      "label": "パークの軽食",
+      "price": 500,
+      "unit": "回",
+      "icon": "snack",
+      "price_note": "目安"
+    },
+    {
+      "label": "1デーパスポート",
+      "price": 12400,
+      "unit": "枚",
+      "icon": "ticket",
+      "price_note": "最高額"
+    }
+  ],
+  "time_items": [
+    {
+      "label": "トイレの行列",
+      "min": 5,
+      "unit": "回",
+      "icon": "toilet",
+      "min_note": "目安"
+    },
+    {
+      "label": "カフェで一息",
+      "min": 30,
+      "unit": "回",
+      "icon": "cafe",
+      "min_note": "目安"
+    }
+  ],
+  "money_tips": [
+    "新木場乗換と東京駅乗換の差は 片道¥13。どちらも武蔵野線より安い"
+  ],
+  "time_tips": [
+    "東京駅の京葉線ホームは遠く、新幹線からの乗換は標準20分とされるほど"
+  ],
+  "verdict": [
+    "安くて速い 新木場乗換 が最強",
+    "乗換1回でラクに行くなら 武蔵野線(秋津→新秋津は徒歩約9分)"
+  ],
+  "hashtags": [
+    "#おでかけ節約",
+    "#所沢",
+    "#舞浜",
+    "#乗り換え",
+    "#鉄道",
+    "#地図",
+    "#Geogram_JP"
+  ],
+  "_sources": [
+    "運賃・所要時間・乗換: 駅探 所沢→舞浜 2026/11/8(日)13:30発 https://ekitan.com/transit/fare/sf-2610/st-3022",
+    "ペットボトル飲料 自販機・コンビニ約180〜200円: pricey.jp https://www.pricey.jp/web/articles/4890",
+    "1デーパスポート最高額 ¥12,400(2026/10/10〜): トラベル Watch https://travel.watch.impress.co.jp/docs/news/2129397.html",
+    "東京都最低賃金 ¥1,280(2026/10/1〜): 東京労働局 https://jsite.mhlw.go.jp/tokyo-roudoukyoku/news_topics/houdou/20260901chinginka_00001.html",
+    "東京駅 京葉線の乗換 標準20分(JR時刻表): 乗りものニュース https://trafficnews.jp/post/80126",
+    "軽食¥500・トイレ待ち5分・カフェ30分は目安(要差し替え)",
+    "9:00着の発時刻は 所要時間からの目安(5分単位で早めに丸め)"
+  ]
+}
