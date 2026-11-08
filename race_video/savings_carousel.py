@@ -12,7 +12,8 @@
 
 config の要点(詳しくは README の「おでかけ節約カルーセル」と configs/savings_*.json):
     "video_type": "savings",
-    "destination_theme": "maihama" | "yokohama" | "kawagoe" | "shinjuku" | "shibuya" | "none"
+    "destination_theme": "maihama" | "yokohama" | "kawagoe" | "shinjuku" | "shibuya" | "haneda" | "narita" | "skytree"
+                                            | 汎用: "sea"(海) | "mountain"(山) | "mall"(ショッピングモール) | "onsen"(温泉街) | "shrine"(神社) | "temple"(お寺) | "none"
     "basis": "round_trip" | "one_way"     … 節約額・節約時間を往復で見せるか片道か
     "trips_per_year": 6                   … まとめの「年◯回行くなら」
     "arrive_by": "09:00"                  … ◯時に着くなら各ルートは何時に出る?(ルート図・まとめ・投稿文に出る)
@@ -59,6 +60,16 @@ THEMES = {
     "kawagoe":  {"label": "川越",  "accent": (255, 170, 80)},
     "shinjuku": {"label": "新宿",  "accent": (150, 170, 255)},
     "shibuya":  {"label": "渋谷",  "accent": (120, 230, 200)},
+    "haneda":   {"label": "羽田空港", "accent": (110, 200, 255)},
+    "narita":   {"label": "成田空港", "accent": (255, 185, 110)},
+    "skytree":  {"label": "スカイツリー", "accent": (175, 150, 255)},
+    # 汎用(どこでも使える行楽地のタイプ)
+    "sea":      {"label": "海の行楽地", "accent": (80, 210, 235)},
+    "mountain": {"label": "山の行楽地", "accent": (120, 220, 130)},
+    "mall":     {"label": "ショッピングモール", "accent": (255, 200, 90)},
+    "onsen":    {"label": "温泉街", "accent": (255, 150, 115)},
+    "shrine":   {"label": "神社", "accent": (255, 95, 85)},
+    "temple":   {"label": "お寺", "accent": (235, 195, 110)},
 }
 
 
@@ -417,6 +428,279 @@ def _mix(a, b, t):
     return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
 
 
+def _rot(pts, cx, cy, deg):
+    a = math.radians(deg)
+    ca, sa = math.cos(a), math.sin(a)
+    return [(cx + x * ca - y * sa, cy + x * sa + y * ca) for x, y in pts]
+
+
+def _airplane(d, cx, cy, s, fill, line, deg=-18):
+    """横から見た旅客機(汎用)。s=全長"""
+    L = s
+    body = [(-0.5 * L, -0.03 * L), (0.36 * L, -0.045 * L), (0.46 * L, -0.03 * L), (0.5 * L, 0), (0.46 * L, 0.03 * L),
+            (0.36 * L, 0.045 * L), (-0.42 * L, 0.04 * L), (-0.5 * L, 0.01 * L)]
+    wing = [(0.06 * L, 0.02 * L), (-0.16 * L, 0.26 * L), (-0.24 * L, 0.26 * L), (-0.1 * L, 0.02 * L)]
+    wing2 = [(0.02 * L, -0.02 * L), (-0.12 * L, -0.12 * L), (-0.18 * L, -0.12 * L), (-0.1 * L, -0.02 * L)]
+    tail = [(-0.36 * L, -0.03 * L), (-0.46 * L, -0.2 * L), (-0.52 * L, -0.2 * L), (-0.5 * L, -0.03 * L)]
+    stab = [(-0.4 * L, 0.02 * L), (-0.5 * L, 0.09 * L), (-0.54 * L, 0.09 * L), (-0.5 * L, 0.01 * L)]
+    eng = [(-0.02 * L, 0.1 * L), (-0.12 * L, 0.1 * L), (-0.12 * L, 0.15 * L), (-0.02 * L, 0.15 * L)]
+    for poly in (wing2, tail, stab, body, wing, eng):
+        d.polygon(_rot(poly, cx, cy, deg), fill=fill, outline=line)
+        d.line(_rot(poly + [poly[0]], cx, cy, deg), fill=line, width=2)
+    for k in range(9):
+        x = 0.3 * L - k * 0.075 * L
+        wx, wy = _rot([(x, -0.012 * L)], cx, cy, deg)[0]
+        d.ellipse((wx - 3, wy - 3, wx + 3, wy + 3), fill=line)
+
+
+def _control_tower(d, cx, base_y, s, fill, line):
+    """空港の管制塔(汎用)"""
+    w = s * 0.12
+    d.polygon([(cx - w * 0.7, base_y), (cx + w * 0.7, base_y), (cx + w * 0.42, base_y - s * 0.62), (cx - w * 0.42, base_y - s * 0.62)], fill=fill, outline=line)
+    cab_y = base_y - s * 0.62
+    d.polygon([(cx - w * 0.6, cab_y), (cx + w * 0.6, cab_y), (cx + w * 1.05, cab_y - s * 0.12), (cx - w * 1.05, cab_y - s * 0.12)], fill=fill, outline=line)
+    for k in range(5):
+        x = cx - w * 0.85 + k * w * 0.42
+        d.line([(x, cab_y - s * 0.02), (x + w * 0.05, cab_y - s * 0.1)], fill=line, width=3)
+    d.rectangle((cx - w * 1.1, cab_y - s * 0.15, cx + w * 1.1, cab_y - s * 0.12), fill=line)
+    d.line([(cx, cab_y - s * 0.15), (cx, cab_y - s * 0.26)], fill=line, width=3)
+    d.ellipse((cx - 5, cab_y - s * 0.27 - 5, cx + 5, cab_y - s * 0.27 + 5), fill=line)
+    for k in range(1, 6):
+        y = base_y - k * s * 0.1
+        d.line([(cx - w * 0.3, y), (cx + w * 0.3, y)], fill=line, width=1)
+
+
+def _runway(d, x0, x1, y, line, lights=True):
+    d.line([(x0, y), (x1, y)], fill=line, width=3)
+    for x in range(int(x0 + 10), int(x1 - 10), 34):
+        d.line([(x, y + 12), (x + 16, y + 12)], fill=line, width=3)
+    if lights:
+        for x in range(int(x0), int(x1), 22):
+            d.ellipse((x - 3, y + 22, x + 3, y + 28), fill=line)
+
+
+def _lattice_tower(d, cx, base_y, s, fill, line):
+    """細長い格子の電波塔(汎用)。足元は三角、上へ行くほど細く、展望台が2段"""
+    top = base_y - s * 0.97
+    def half(y):                       # 高さ y での半幅
+        t = (base_y - y) / (base_y - top)
+        return s * (0.13 * (1 - t) ** 1.6 + 0.012)
+    ys = [base_y - k * (base_y - top) / 40 for k in range(41)]
+    left = [(cx - half(y), y) for y in ys]
+    right = [(cx + half(y), y) for y in ys][::-1]
+    d.polygon(left + right, fill=fill, outline=line)
+    d.line(left, fill=line, width=2)
+    d.line(right, fill=line, width=2)
+    for k in range(0, 34):              # 斜めの格子
+        y0, y1 = ys[k], ys[k + 1]
+        d.line([(cx - half(y0), y0), (cx + half(y1), y1)], fill=line, width=1)
+        d.line([(cx + half(y0), y0), (cx - half(y1), y1)], fill=line, width=1)
+    for frac, hw, hh in ((0.55, 0.075, 0.04), (0.73, 0.05, 0.03)):   # 展望台
+        y = base_y - s * frac
+        d.rounded_rectangle((cx - s * hw, y - s * hh, cx + s * hw, y + s * hh), radius=int(s * hh), fill=fill, outline=line, width=3)
+        for k in range(7):
+            x = cx - s * hw * 0.8 + k * s * hw * 1.6 / 6
+            d.line([(x, y - s * hh * 0.4), (x, y + s * hh * 0.4)], fill=line, width=2)
+    d.line([(cx, ys[34]), (cx, top - s * 0.02)], fill=line, width=3)
+
+
+def _waves(d, x0, x1, y, amp, line, n=3, gap=18):
+    for k in range(n):
+        yy = y + k * gap
+        pts = [(x, yy + math.sin((x - x0) / 26 + k) * amp) for x in range(int(x0), int(x1) + 1, 6)]
+        d.line(pts, fill=line, width=3)
+
+
+def _sea(d, s, base, fill, line):
+    hz = base - s * 0.42                                        # 水平線
+    sx, sr = s * 0.7, s * 0.17
+    d.pieslice((sx - sr, hz - sr, sx + sr, hz + sr), 180, 360, fill=fill, outline=line, width=3)   # 夕日
+    for k in range(9):
+        a = math.pi + math.pi * (k + 0.5) / 9
+        d.line([(sx + math.cos(a) * sr * 1.25, hz + math.sin(a) * sr * 1.25), (sx + math.cos(a) * sr * 1.55, hz + math.sin(a) * sr * 1.55)], fill=line, width=3)
+    d.line([(s * 0.02, hz), (s * 0.98, hz)], fill=line, width=3)
+    _waves(d, s * 0.04, s * 0.96, hz + s * 0.07, 4, line, n=3, gap=s * 0.065)
+    # ヨット
+    bx, by = s * 0.36, hz - 2
+    d.polygon([(bx, by - s * 0.2), (bx, by - s * 0.03), (bx + s * 0.11, by - s * 0.03)], fill=fill, outline=line)
+    d.polygon([(bx - s * 0.07, by - s * 0.02), (bx + s * 0.14, by - s * 0.02), (bx + s * 0.1, by + s * 0.02), (bx - s * 0.04, by + s * 0.02)], fill=line)
+    # 砂浜とパラソル
+    beach = base - s * 0.13
+    d.polygon([(0, base), (s, base), (s, beach + s * 0.03), (s * 0.55, beach - s * 0.01), (0, beach + s * 0.02)], fill=fill, outline=line)
+    d.line([(0, beach + s * 0.02), (s * 0.55, beach - s * 0.01), (s, beach + s * 0.03)], fill=line, width=3)
+    px, py = s * 0.18, base - s * 0.04
+    d.line([(px, py), (px + s * 0.03, py - s * 0.36)], fill=line, width=4)
+    d.pieslice((px - s * 0.17, py - s * 0.46, px + s * 0.23, py - s * 0.22), 190, 350, fill=fill, outline=line, width=3)
+    for k in range(4):
+        a = math.radians(195 + k * 50)
+        d.line([(px + s * 0.03, py - s * 0.36), (px + s * 0.03 + math.cos(a) * s * 0.19, py - s * 0.36 + math.sin(a) * s * 0.1)], fill=line, width=2)
+    d.rounded_rectangle((s * 0.3, base - s * 0.07, s * 0.46, base - s * 0.045), radius=4, fill=line)   # ビーチタオル
+
+
+def _ridge(x0, x1, base, peak_x, peak_y, n=48):
+    """なだらかな山の稜線: 裾は広く、頂上は丸い(コサインの山)"""
+    pts = []
+    for i in range(n + 1):
+        x = x0 + (x1 - x0) * i / n
+        if x <= peak_x:
+            t = (x - x0) / max(peak_x - x0, 1e-6)
+        else:
+            t = (x1 - x) / max(x1 - peak_x, 1e-6)
+        h = (1 - math.cos(math.pi * t)) / 2          # 0→1 のなめらかな立ち上がり
+        pts.append((x, base - (base - peak_y) * h ** 1.15))
+    return pts
+
+
+def _mountain(d, s, base, fill, line):
+    # 奥の山なみ → 手前の大きな山 の順に重ねる(どれも頂上は丸め)
+    for x0, x1, px, py in ((s * -0.15, s * 0.6, s * 0.2, base - s * 0.36), (s * 0.42, s * 1.15, s * 0.82, base - s * 0.4)):
+        ridge = _ridge(x0, x1, base, px, py)
+        d.polygon([(x0, base)] + ridge + [(x1, base)], fill=fill)
+        d.line(ridge, fill=line, width=2)
+    ridge = _ridge(s * 0.0, s * 1.0, base, s * 0.5, base - s * 0.56)
+    d.polygon([(s * 0.0, base)] + ridge + [(s * 1.0, base)], fill=fill)
+    d.line(ridge, fill=line, width=4)
+    # 頂上の雪(稜線に沿った短い帯)
+    top = [p for p in ridge if p[1] < base - s * 0.49]
+    if len(top) > 2:
+        d.line(top, fill=line, width=9)
+        mid = top[len(top) // 2]
+        d.line([(top[0][0] + 6, top[0][1] + 10), (mid[0] - s * 0.02, mid[1] + s * 0.05), (mid[0] + s * 0.02, mid[1] + s * 0.03), (top[-1][0] - 6, top[-1][1] + 10)], fill=line, width=3)
+    # ロープウェイ(ゆるいカーブのケーブル)
+    c0, c1 = (s * 0.06, base - s * 0.14), (s * 0.44, base - s * 0.52)
+    cable = [(c0[0] + (c1[0] - c0[0]) * t, c0[1] + (c1[1] - c0[1]) * t + math.sin(math.pi * t) * s * 0.03) for t in [i / 30 for i in range(31)]]
+    d.line(cable, fill=line, width=2)
+    gx, gy = cable[13]
+    d.line([(gx, gy), (gx, gy + s * 0.05)], fill=line, width=2)
+    d.rounded_rectangle((gx - s * 0.05, gy + s * 0.05, gx + s * 0.05, gy + s * 0.13), radius=8, fill=fill, outline=line, width=3)
+    d.line([(gx - s * 0.035, gy + s * 0.08), (gx + s * 0.035, gy + s * 0.08)], fill=line, width=2)
+    # 手前の木(丸い広葉樹)
+    for k, x in enumerate((s * 0.12, s * 0.22, s * 0.7, s * 0.82, s * 0.92)):
+        r = s * (0.04 if k % 2 else 0.05)
+        d.line([(x, base), (x, base - r * 1.4)], fill=line, width=3)
+        d.ellipse((x - r, base - r * 3.2, x + r, base - r * 1.2), fill=fill, outline=line, width=3)
+
+
+def _mall(d, s, base, fill, line):
+    """郊外型のショッピングモール: 横長で平たい建物 + 広い駐車場 + 道路沿いの看板"""
+    ground = base - s * 0.2                                     # 建物の足元(手前は駐車場)
+    x0, x1, top = s * 0.02, s * 0.98, ground - s * 0.2
+    d.rectangle((x0, top, x1, ground), fill=fill, outline=line, width=3)
+    d.line([(x0 - s * 0.01, top), (x1 + s * 0.01, top)], fill=line, width=5)       # 平らな屋上のふち
+    # 入口(中央の少し高いガラスのボックス)と左右の入口
+    for cx, w, h in ((s * 0.5, 0.2, 0.08), (s * 0.16, 0.12, 0.03), (s * 0.84, 0.12, 0.03)):
+        d.rectangle((cx - s * w / 2, top - s * h, cx + s * w / 2, ground), fill=fill, outline=line, width=3)
+        for k in range(1, 4):
+            x = cx - s * w / 2 + k * s * w / 4
+            d.line([(x, top - s * h + 6), (x, ground)], fill=line, width=1)
+        d.rectangle((cx - s * w / 2 - 6, ground - s * 0.075, cx + s * w / 2 + 6, ground - s * 0.065), fill=line)   # ひさし
+    d.rounded_rectangle((s * 0.42, top - s * 0.06, s * 0.58, top - s * 0.02), radius=4, fill=line)                 # 壁の看板(文字なし)
+    for x in (s * 0.3, s * 0.36, s * 0.64, s * 0.7):                                                              # 店の窓
+        d.rectangle((x - s * 0.02, top + s * 0.06, x + s * 0.02, ground - s * 0.03), outline=line, width=2)
+    # 駐車場(手前): 白線と車
+    d.line([(0, ground), (s, ground)], fill=line, width=2)
+    for row, y0 in enumerate((ground + s * 0.03, ground + s * 0.11)):
+        for k in range(12):
+            x = s * 0.04 + k * s * 0.08
+            d.line([(x, y0), (x + s * 0.012, y0 + s * 0.06)], fill=line, width=2)
+            if (k * 7 + row * 3) % 4 == 0:
+                d.rounded_rectangle((x + s * 0.012, y0 + s * 0.012, x + s * 0.062, y0 + s * 0.05), radius=6, fill=line)
+    # 道路沿いの看板(ポール)
+    px = s * 0.9
+    d.line([(px, base), (px, base - s * 0.62)], fill=line, width=5)
+    d.rounded_rectangle((px - s * 0.075, base - s * 0.74, px + s * 0.075, base - s * 0.6), radius=8, fill=fill, outline=line, width=3)
+    d.text((px, base - s * 0.67), "★", font=font(int(s * 0.06), "black"), fill=line, anchor="mm")
+    for k in range(3):                                                                                           # 植え込み
+        x = s * (0.1 + k * 0.08)
+        d.ellipse((x - s * 0.025, ground - s * 0.05, x + s * 0.025, ground), fill=fill, outline=line, width=2)
+
+
+def _onsen(d, s, base, fill, line):
+    # 湯船と湯気(温泉マーク風)
+    cx, cy = s * 0.5, base - s * 0.3
+    d.ellipse((cx - s * 0.26, cy - s * 0.08, cx + s * 0.26, cy + s * 0.12), fill=fill, outline=line, width=4)
+    for k, dx in enumerate((-0.12, 0, 0.12)):
+        x = cx + s * dx
+        pts = [(x + math.sin(t / 7 * math.pi * 2 + k) * s * 0.03, cy - s * 0.1 - t * s * 0.06) for t in range(7)]
+        d.line(pts, fill=line, width=max(4, int(s * 0.025)), joint="curve")
+    # 旅館の屋根
+    for x, w in ((s * 0.0, 0.3), (s * 0.7, 0.3)):
+        d.rectangle((x + s * 0.03, base - s * 0.2, x + s * (w - 0.03), base), fill=fill, outline=line, width=2)
+        d.polygon([(x, base - s * 0.2), (x + s * w, base - s * 0.2), (x + s * w * 0.75, base - s * 0.3), (x + s * w * 0.25, base - s * 0.3)], fill=line)
+        for k in range(3):
+            xx = x + s * (0.06 + k * 0.08)
+            d.rectangle((xx, base - s * 0.15, xx + s * 0.04, base - s * 0.07), fill=line)
+    for k in range(5):                                          # ちょうちん
+        x = s * (0.32 + k * 0.09)
+        d.line([(x, base - s * 0.06), (x, base - s * 0.04)], fill=line, width=2)
+        d.ellipse((x - s * 0.02, base - s * 0.04, x + s * 0.02, base), fill=line)
+
+
+def _torii(d, cx, base, s, fill, line):
+    w, h = s * 0.62, s * 0.62
+    pw = s * 0.05
+    for x in (cx - w * 0.36, cx + w * 0.36):
+        d.polygon([(x - pw / 2, base - h + s * 0.08), (x + pw / 2, base - h + s * 0.08), (x + pw * 0.62, base), (x - pw * 0.62, base)], fill=line)
+    d.rectangle((cx - w * 0.46, base - h + s * 0.12, cx + w * 0.46, base - h + s * 0.15), fill=line)           # 貫
+    d.polygon([(cx - w * 0.6, base - h), (cx + w * 0.6, base - h), (cx + w * 0.54, base - h + s * 0.05), (cx - w * 0.54, base - h + s * 0.05)], fill=line)   # 笠木
+    d.polygon([(cx - w * 0.6, base - h), (cx - w * 0.66, base - h - s * 0.03), (cx - w * 0.5, base - h)], fill=line)
+    d.polygon([(cx + w * 0.6, base - h), (cx + w * 0.66, base - h - s * 0.03), (cx + w * 0.5, base - h)], fill=line)
+    d.rectangle((cx - s * 0.03, base - h + s * 0.05, cx + s * 0.03, base - h + s * 0.12), fill=line)          # 額束
+
+
+def _shrine(d, s, base, fill, line):
+    # 奥の社殿
+    x0, x1 = s * 0.46, s * 0.96
+    d.rectangle((x0 + s * 0.04, base - s * 0.2, x1 - s * 0.04, base), fill=fill, outline=line, width=2)
+    d.polygon([(x0 - s * 0.02, base - s * 0.2), (x1 + s * 0.02, base - s * 0.2), (x1 - s * 0.08, base - s * 0.34), (x0 + s * 0.08, base - s * 0.34)], fill=fill, outline=line)
+    d.line([(x0 - s * 0.02, base - s * 0.2), (x0 + s * 0.08, base - s * 0.34), (x1 - s * 0.08, base - s * 0.34), (x1 + s * 0.02, base - s * 0.2)], fill=line, width=3)
+    for xx in (x0 + s * 0.14, x1 - s * 0.14):                   # 千木
+        d.line([(xx - s * 0.03, base - s * 0.38), (xx + s * 0.03, base - s * 0.32)], fill=line, width=3)
+        d.line([(xx + s * 0.03, base - s * 0.38), (xx - s * 0.03, base - s * 0.32)], fill=line, width=3)
+    d.line([(x0 + s * 0.08, base - s * 0.2), (x1 - s * 0.08, base - s * 0.2)], fill=line, width=3)
+    for k in range(4):
+        xx = x0 + s * (0.1 + k * 0.1)
+        d.line([(xx, base - s * 0.18), (xx, base)], fill=line, width=2)
+    _torii(d, s * 0.29, base, s * 0.72, fill, line)
+    for x in (s * 0.08, s * 0.52):                              # 灯籠
+        d.rectangle((x - s * 0.012, base - s * 0.12, x + s * 0.012, base), fill=line)
+        d.rectangle((x - s * 0.03, base - s * 0.17, x + s * 0.03, base - s * 0.12), fill=fill, outline=line, width=2)
+        d.polygon([(x - s * 0.045, base - s * 0.17), (x + s * 0.045, base - s * 0.17), (x, base - s * 0.21)], fill=line)
+
+
+def _pagoda(d, cx, base, s, fill, line):
+    """五重塔(汎用)"""
+    y = base
+    w = s * 0.22
+    for k in range(5):
+        h = s * 0.1
+        bw = w * (1 - k * 0.1)
+        d.rectangle((cx - bw * 0.36, y - h, cx + bw * 0.36, y), fill=fill, outline=line, width=2)
+        ry = y - h
+        d.polygon([(cx - bw * 0.62, ry + s * 0.012), (cx + bw * 0.62, ry + s * 0.012), (cx + bw * 0.4, ry - s * 0.03), (cx - bw * 0.4, ry - s * 0.03)], fill=line)
+        d.line([(cx - bw * 0.62, ry + s * 0.012), (cx - bw * 0.68, ry - s * 0.004)], fill=line, width=3)
+        d.line([(cx + bw * 0.62, ry + s * 0.012), (cx + bw * 0.68, ry - s * 0.004)], fill=line, width=3)
+        y = ry - s * 0.03
+    d.line([(cx, y), (cx, y - s * 0.16)], fill=line, width=4)    # 相輪
+    for k in range(6):
+        yy = y - s * 0.02 - k * s * 0.022
+        d.line([(cx - s * 0.018, yy), (cx + s * 0.018, yy)], fill=line, width=3)
+
+
+def _temple(d, s, base, fill, line):
+    # 本堂(大きな屋根)
+    x0, x1 = s * 0.02, s * 0.62
+    d.rectangle((x0 + s * 0.06, base - s * 0.18, x1 - s * 0.06, base), fill=fill, outline=line, width=2)
+    d.polygon([(x0 - s * 0.01, base - s * 0.17), (x1 + s * 0.01, base - s * 0.17), (x1 - s * 0.1, base - s * 0.3), (x0 + s * 0.1, base - s * 0.3)], fill=line)
+    d.line([(x0 - s * 0.01, base - s * 0.17), (x0 - s * 0.03, base - s * 0.2)], fill=line, width=3)
+    d.line([(x1 + s * 0.01, base - s * 0.17), (x1 + s * 0.03, base - s * 0.2)], fill=line, width=3)
+    d.polygon([(x0 + s * 0.16, base - s * 0.3), (x1 - s * 0.16, base - s * 0.3), (x1 - s * 0.22, base - s * 0.36), (x0 + s * 0.22, base - s * 0.36)], fill=line)
+    for k in range(5):
+        xx = x0 + s * (0.1 + k * 0.1)
+        d.line([(xx, base - s * 0.16), (xx, base)], fill=line, width=2)
+    _pagoda(d, s * 0.8, base, s, fill, line)
+
+
 def draw_theme_landmark(theme, size, neon=False):
     """目的地のランドマーク(1枚の透過レイヤー size x size)。
     neon=True は表紙用: 半透明の塗り + 白っぽく光る輪郭(あとで neon_landmark() で発光させる)"""
@@ -444,6 +728,29 @@ def draw_theme_landmark(theme, size, neon=False):
         _kura(d, s * 0.04, base, s * 0.3, s * 0.3, wall, line, roof)
         _bell_tower(d, s * 0.56, base, s * 0.9, wood, line, roof)
         _kura(d, s * 0.7, base, s * 0.26, s * 0.26, wall, line, roof)
+    elif theme == "haneda":
+        _control_tower(d, s * 0.78, base, s * 0.8, fill, line)
+        _runway(d, s * 0.02, s * 0.98, base - 6, line, lights=False)
+        _airplane(d, s * 0.4, s * 0.36, s * 0.7, fill, line, deg=-16)
+    elif theme == "narita":
+        _control_tower(d, s * 0.14, base, s * 0.72, fill, line)
+        _runway(d, s * 0.02, s * 0.98, base - 30, line, lights=True)
+        _airplane(d, s * 0.62, s * 0.44, s * 0.62, fill, line, deg=-22)
+    elif theme == "skytree":
+        _skyline(d, s * 0.02, base, s * 0.96, s * 0.16, fill, line, seed=11)
+        _lattice_tower(d, s * 0.5, base, s, fill, line)
+    elif theme == "sea":
+        _sea(d, s, base, fill, line)
+    elif theme == "mountain":
+        _mountain(d, s, base, fill, line)
+    elif theme == "mall":
+        _mall(d, s, base, fill, line)
+    elif theme == "onsen":
+        _onsen(d, s, base, fill, line)
+    elif theme == "shrine":
+        _shrine(d, s, base, fill, line)
+    elif theme == "temple":
+        _temple(d, s, base, fill, line)
     elif theme == "shinjuku":
         _skyline(d, s * 0.02, base, s * 0.96, s * 0.9, fill, line, seed=7)
     elif theme == "shibuya":
@@ -614,7 +921,7 @@ def _cover_projection(o_lon, o_lat, d_lon, d_lat):
     lims = []
     if vx > 0: lims.append((930 - dest_x) / vx)
     if vx < 0: lims.append((150 - dest_x) / vx)
-    if vy > 0: lims.append((950 - dest_y) / vy)
+    if vy > 0: lims.append((1020 - dest_y) / vy)
     if vy < 0: lims.append((585 - dest_y) / vy)
     sc = min([sc] + lims)
     return {"lon_min": d_lon, "lat_max": d_lat, "cos0": cos0, "x_min": 0.0, "y_min": 0.0,
@@ -774,12 +1081,18 @@ def slide_cover(config, routes, paths, geojson_path, station_db):
             d.ellipse((x - r, y - r, x + r, y + r), outline=col + (al,), width=3)
         d.ellipse((x - 12, y - 12, x + 12, y + 12), fill=INK + (255,), outline=col + (255,), width=5)
 
-    def label(x, y, tag, name, below):
+    def label(x, y, tag, name, pos):
+        """pos: below / above / left / right(ピンに対してラベルを置く向き)"""
         f = font(46, "black")
         ft = font(26, "black")
         tw = text_w(d, name, f) + 64
-        bx = min(max(x, 90 + tw / 2), W - 90 - tw / 2)
-        by = y + 78 if below else y - 78
+        if pos in ("left", "right"):
+            bx = x - (tw / 2 + 56) if pos == "left" else x + (tw / 2 + 56)
+            by = y
+        else:
+            bx = x
+            by = y + 78 if pos == "below" else y - 78
+        bx = min(max(bx, 90 + tw / 2), W - 90 - tw / 2)
         rrect(d, (bx - tw / 2 - 14, by - 36, bx + tw / 2 + 14, by + 36), 36, fill=(5, 8, 18, 215), outline=GOLD + (220,), width=2)
         d.ellipse((bx - tw / 2 - 4, by - 26, bx - tw / 2 + 48, by + 26), fill=GOLD + (255,))
         d.text((bx - tw / 2 + 22, by + 1), tag, font=ft, fill=DARK, anchor="mm")
@@ -787,8 +1100,15 @@ def slide_cover(config, routes, paths, geojson_path, station_db):
 
     pin(ox, oy, GOLD)
     pin(dx, dy, acc)
-    label(ox, oy, "発", o_name, below=oy > dy + 20)
-    label(dx, dy, "着", d_name, below=True)
+    if oy > dy + 20:
+        # 発が着より下(着が北): 着は横、発は着と反対の横に出して重ならないようにする
+        dpos = "left" if ox >= dx else "right"
+        opos = "right" if dpos == "left" else "left"
+        label(ox, oy, "発", o_name, opos)
+        label(dx, dy, "着", d_name, dpos)
+    else:
+        label(ox, oy, "発", o_name, "above")
+        label(dx, dy, "着", d_name, "below")
 
     # --- タイトル
     SX = COVER_SX
