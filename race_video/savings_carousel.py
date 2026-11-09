@@ -1155,10 +1155,13 @@ def fmt_hm(m):
 
 def route_schedule(config, r):
     """ルートの発着時刻。
+    - "hide_schedule": true なら何も出さない(まとめの表は「-」)
     - "schedule_text" があればそれだけを出す(例: 当日は無理)
     - "depart_time" / "arrive_time" があれば時刻表どおりに出す(24:10 のように24時以降も書ける)
     - 無ければ config の "arrive_by" から所要時間を引いた目安(5分単位で早めに丸めて「ごろ」)
     戻り値: {"text"} または {"dep", "arr", "dep_txt", "arr_txt", "est"}。何も分からなければ None"""
+    if r.get("hide_schedule"):
+        return None          # このルートは発時刻を出さない(夜行バスなど、所要時間から引くと変になるもの)
     if r.get("schedule_text"):
         return {"text": r["schedule_text"], "short": r.get("schedule_short", "×")}
     arr = parse_hm(r.get("arrive_time"))
@@ -1702,7 +1705,7 @@ def build_caption(config, routes):
     lines += [f"・{r['name']}" for r in routes]
     if config.get("arrive_by") or any(r.get("depart_time") for r in routes):
         head = f"{dest_display(config, routes)}に{fmt_hm(parse_hm(config['arrive_by']))}着なら" if config.get("arrive_by") else "出発時刻"
-        lines += ["", f"【{head}】"] + [f"・{r['short_name']}: {schedule_line(route_schedule(config, r)) or '-'}" for r in routes]
+        lines += ["", f"【{head}】"] + [f"・{r['short_name']}: {schedule_line(route_schedule(config, r)) or '-'}" for r in routes if not r.get("hide_schedule")]
     lines += ["", "結果は画像をスワイプしてご覧ください。", "いつもどのルートで行くか、コメントで教えてください。", ""]
     note = config.get("as_of", "")
     lines += [f"※{note} {config.get('caption_note', '運賃はIC・大人。時間は検索結果の一例で、時間帯により変わります')}".strip()]

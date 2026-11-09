@@ -354,6 +354,7 @@ function equivalents(diff, items, key, rep) {
 const parseHM = v => { const m = String(v || "").trim().replace("：", ":").match(/^(\d{1,2}):(\d{2})$/); return m ? +m[1] * 60 + +m[2] : null; };
 const fmtHM = m => { m = ((m % 1440) + 1440) % 1440; return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`; };
 function routeSchedule(cfg, r) {
+  if (r.hide_schedule) return null;
   if (r.schedule_text) return { text: r.schedule_text, short: r.schedule_short || "×" };
   let arr = parseHM(r.arrive_time); if (arr == null) arr = parseHM(cfg.arrive_by);
   let dep = parseHM(r.depart_time), est = false;
@@ -408,6 +409,7 @@ function buildConfig() {
     const hmOk = v => /^\d{1,2}[:：]\d{2}$/.test(String(v || "").trim());
     ["depart_time", "arrive_time"].forEach(k => { if (r[k]) { if (hmOk(r[k])) out[k] = r[k].trim().replace("：", ":"); else problems.push(`${label}: 時刻は 7:40 や 24:10 の形で入れてください`); } });
     if (r.schedule_text) { out.schedule_text = r.schedule_text; if (r.schedule_short) out.schedule_short = r.schedule_short; }
+    if (r.hide_schedule) out.hide_schedule = true;
     if (r.fare_note) out.fare_note = r.fare_note;
     return out;
   });
@@ -580,6 +582,8 @@ function renderRoutes() {
       fld("walk", "乗換の徒歩(分・任意)", { inputmode: "numeric", class: "mono" }), fld("time_note", "時間のメモ(任意)"),
       fld("depart_time", "発時刻(時刻表の値・任意)", { class: "mono", placeholder: "空欄=到着時刻−所要時間の目安" }), fld("arrive_time", "着時刻(任意)", { class: "mono", placeholder: "空欄=到着したい時刻" }),
       fld("schedule_text", "時刻の代わりの一文(任意)", { placeholder: "当日は間に合わない など" }), fld("schedule_short", "まとめ表の短い表示", { placeholder: "当日×" }),
+      (() => { const id = `r${ri}-hide_schedule`; const c = el("input", { type: "checkbox", id, checked: !!r.hide_schedule }); c.onchange = () => { r.hide_schedule = c.checked; update(); };
+        return el("div", { class: "field" }, [el("label", { for: id }, ["発時刻"]), el("label", { class: "thr", for: id, style: "padding:8px 0" }, [c, "このルートは出さない"])]); })(),
     ])]));
     box.appendChild(card);
   });
@@ -740,7 +744,7 @@ function importConfig(c) {
     money_tips: (c.money_tips || []).join("\n"), time_tips: (c.time_tips || []).join("\n"), verdict1: v[0] || "", verdict2: v[1] || "", hashtags: (c.hashtags || []).join(" "),
     routes: (c.routes || []).slice(0, MAX_ROUTES).map((r, i) => ({ key: r.key || `route_${i}`, name: r.name || "", short_name: r.short_name || "", color: rgbToHex(r.color || [154, 163, 181]),
       fare_ic: s(r.fare?.ic ?? r.fare), fare_ticket: s(r.fare?.ticket), time_min: s(r.time_min), transfers: s(r.transfers), walk: s(r.transfer_walk_min), time_note: r.time_note || "", fare_note: r.fare_note || "", fare_from: !!r.fare?.from, fare_max: s(r.fare?.max),
-      depart_time: r.depart_time || "", arrive_time: r.arrive_time || "", schedule_text: r.schedule_text || "", schedule_short: r.schedule_short || "",
+      depart_time: r.depart_time || "", arrive_time: r.arrive_time || "", schedule_text: r.schedule_text || "", schedule_short: r.schedule_short || "", hide_schedule: !!r.hide_schedule,
       legs: (r.legs || []).map(l => ({ mode: l.mode || "rail", line: l.line, from: l.from, to: l.to, train: l.train || "", through: !!l.through, ...(l.color ? { color: rgbToHex(l.color) } : {}),
         ...(l.from_lonlat ? { from_ll: `${l.from_lonlat[1]}, ${l.from_lonlat[0]}` } : {}), ...(l.to_lonlat ? { to_ll: `${l.to_lonlat[1]}, ${l.to_lonlat[0]}` } : {}) })) })),
     fare_label: c.fare_label || "", time_label: c.time_label || "", arrive_by: c.arrive_by || "" };
